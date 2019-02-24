@@ -163,11 +163,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, _, _ := r.BasicAuth()
 	cgiHandler := cgi.Handler{
 		Path: handler,
 		Root: s.DocumentRoot,
 		Dir:  s.DocumentRoot,
-		Env:  []string{"SCRIPT_FILENAME=" + file},
+		Env:  []string{"SCRIPT_FILENAME=" + file, "REMOTE_USER=" + user},
 		Args: []string{file},
 	}
 	cgiHandler.ServeHTTP(w, r)
