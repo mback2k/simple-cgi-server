@@ -181,6 +181,9 @@ func (s *Server) checkDocumentRoot() error {
 		}
 		s.DocumentRoot = root
 	}
+	if !strings.HasSuffix(s.DocumentRoot, "/") {
+		s.DocumentRoot = s.DocumentRoot + "/"
+	}
 
 	stat, err := os.Stat(s.DocumentRoot)
 	if err != nil {
