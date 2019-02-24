@@ -168,7 +168,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	user, _, _ := r.BasicAuth()
 	cgiHandler := cgi.Handler{
 		Path:       handler,
-		Root:       s.DocumentRoot,
+		Root:       "/",
 		Dir:        s.DocumentRoot,
 		InheritEnv: s.InheritEnv,
 		Env:        []string{"SCRIPT_FILENAME=" + file, "REMOTE_USER=" + user},
