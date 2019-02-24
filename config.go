@@ -40,6 +40,7 @@ type configLogging struct {
 type config struct {
 	Address        string
 	DocumentRoot   string
+	InheritEnv     []string
 	DirectoryIndex []string
 	DefaultHandler string
 	AliasList      []*configAlias
@@ -51,6 +52,7 @@ func loadConfig(s *cgiserver.Server) (*config, error) {
 	vpr := viper.GetViper()
 	vpr.SetDefault("Address", s.Address)
 	vpr.SetDefault("DocumentRoot", s.DocumentRoot)
+	vpr.SetDefault("InheritEnv", s.InheritEnv)
 	vpr.SetDefault("DirectoryIndex", s.DirectoryIndex)
 	vpr.SetDefault("DefaultHandler", s.DefaultHandler)
 	vpr.SetConfigName("simple-cgi-server")

@@ -36,6 +36,7 @@ type Server struct {
 
 	Address        string
 	DocumentRoot   string
+	InheritEnv     []string
 	DirectoryIndex []string
 	DefaultHandler string
 	AliasMap       map[string]string
@@ -47,6 +48,7 @@ func CGIServer() *Server {
 	s := &Server{
 		Address:        ":http-alt",
 		DocumentRoot:   ".",
+		InheritEnv:     []string{},
 		DirectoryIndex: []string{"index.html"},
 		DefaultHandler: "index.cgi",
 		AliasMap:       map[string]string{},
@@ -165,11 +167,12 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	user, _, _ := r.BasicAuth()
 	cgiHandler := cgi.Handler{
-		Path: handler,
-		Root: s.DocumentRoot,
-		Dir:  s.DocumentRoot,
-		Env:  []string{"SCRIPT_FILENAME=" + file, "REMOTE_USER=" + user},
-		Args: []string{file},
+		Path:       handler,
+		Root:       s.DocumentRoot,
+		Dir:        s.DocumentRoot,
+		InheritEnv: s.InheritEnv,
+		Env:        []string{"SCRIPT_FILENAME=" + file, "REMOTE_USER=" + user},
+		Args:       []string{file},
 	}
 	cgiHandler.ServeHTTP(w, r)
 }
