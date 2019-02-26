@@ -166,6 +166,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, _, _ := r.BasicAuth()
+	user = strings.Replace(user, ":", "", -1)
+	user = strings.Replace(user, "=", "", -1)
 	cgiHandler := cgi.Handler{
 		Path:       handler,
 		Root:       "/",
