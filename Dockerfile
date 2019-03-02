@@ -8,7 +8,7 @@ RUN go get
 RUN go build -ldflags="-s -w"
 RUN chmod +x simple-cgi-server
 
-FROM alpine:latest
+FROM mback2k/alpine:latest
 RUN apk --no-cache --update upgrade && apk --no-cache add ca-certificates
 
 COPY --from=build /go/src/github.com/mback2k/simple-cgi-server/simple-cgi-server /usr/local/bin/simple-cgi-server
