@@ -34,25 +34,27 @@ import (
 type Server struct {
 	http.Handler
 
-	Address        string
-	DocumentRoot   string
-	InheritEnv     []string
-	DirectoryIndex []string
-	DefaultHandler string
-	AliasMap       map[string]string
-	HandlerMap     map[string]string
+	Address          string
+	DocumentRoot     string
+	InheritEnv       []string
+	DirectoryListing bool
+	DirectoryIndex   []string
+	DefaultHandler   string
+	AliasMap         map[string]string
+	HandlerMap       map[string]string
 }
 
 // CGIServer creates a new Server struct
 func CGIServer() *Server {
 	s := &Server{
-		Address:        ":http-alt",
-		DocumentRoot:   ".",
-		InheritEnv:     []string{},
-		DirectoryIndex: []string{"index.html"},
-		DefaultHandler: "index.cgi",
-		AliasMap:       map[string]string{},
-		HandlerMap:     map[string]string{},
+		Address:          ":http-alt",
+		DocumentRoot:     ".",
+		InheritEnv:       []string{},
+		DirectoryListing: false,
+		DirectoryIndex:   []string{"index.html"},
+		DefaultHandler:   "index.cgi",
+		AliasMap:         map[string]string{},
+		HandlerMap:       map[string]string{},
 	}
 	return s
 }
@@ -92,28 +94,30 @@ func (s *Server) getParentDirectory(pathstr string) string {
 	return pathstr
 }
 
-func (s *Server) findDirectoryFile(file string) (string, error) {
+func (s *Server) findDirectoryFile(file string, cgi bool) (string, error) {
 	log.Debugln("findDirectoryFile", file)
 	stat, err := os.Stat(file)
 	if err != nil {
-		// File exists, check if the parent is a CGI handler
-		filedir := s.getParentDirectory(file)
-		fileext := filepath.Ext(filedir)
-		handler, foundHandler := s.HandlerMap[fileext]
-		if foundHandler {
-			// Found CGI handler, check if it actually exists
-			handler, err = s.findDirectoryFile(filedir)
-			if err == nil {
-				file = handler
-			}
-		} else {
-			// No CGI handler found, searching parent directory
-			filedir = s.getParentDirectory(filedir)
-			handler = filepath.Join(filedir, s.DefaultHandler)
-			if handler != file {
-				handler, err = s.findDirectoryFile(handler)
+		if cgi {
+			// File not found, check if the parent is a CGI handler
+			filedir := s.getParentDirectory(file)
+			fileext := filepath.Ext(filedir)
+			handler, foundHandler := s.HandlerMap[fileext]
+			if foundHandler {
+				// Found CGI handler, check if it actually exists
+				handler, err = s.findDirectoryFile(filedir, false)
 				if err == nil {
 					file = handler
+				}
+			} else {
+				// No CGI handler found, searching parent directory
+				filedir = s.getParentDirectory(filedir)
+				handler = filepath.Join(filedir, s.DefaultHandler)
+				if handler != file {
+					handler, err = s.findDirectoryFile(handler, true)
+					if err == nil {
+						file = handler
+					}
 				}
 			}
 		}
@@ -122,11 +126,15 @@ func (s *Server) findDirectoryFile(file string) (string, error) {
 			// Found directory, checking for index files
 			for i := range s.DirectoryIndex {
 				index := filepath.Join(file, s.DirectoryIndex[i])
-				index, err = s.findDirectoryFile(index)
+				index, err = s.findDirectoryFile(index, !s.DirectoryListing)
 				if err == nil {
 					file = index
 					break
 				}
+			}
+			// Ignore missing directory index if listing is enabled
+			if s.DirectoryListing {
+				err = nil
 			}
 		}
 	}
@@ -136,7 +144,7 @@ func (s *Server) findDirectoryFile(file string) (string, error) {
 
 func (s *Server) getFileFromURLFile(urlfile string) (string, error) {
 	file := filepath.Join(s.DocumentRoot, urlfile)
-	return s.findDirectoryFile(file)
+	return s.findDirectoryFile(file, true)
 }
 
 func (s *Server) sendStatus(w http.ResponseWriter, statusCode int) {

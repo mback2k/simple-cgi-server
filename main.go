@@ -40,6 +40,7 @@ func setupServer() *cgiserver.Server {
 	s.Address = c.Address
 	s.DocumentRoot = c.DocumentRoot
 	s.InheritEnv = c.InheritEnv
+	s.DirectoryListing = c.DirectoryListing
 	s.DirectoryIndex = c.DirectoryIndex
 	s.DefaultHandler = c.DefaultHandler
 	for i := range c.AliasList {

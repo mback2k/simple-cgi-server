@@ -38,14 +38,15 @@ type configLogging struct {
 }
 
 type config struct {
-	Address        string
-	DocumentRoot   string
-	InheritEnv     []string
-	DirectoryIndex []string
-	DefaultHandler string
-	AliasList      []*configAlias
-	HandlerList    []*configHandler
-	Logging        *configLogging
+	Address          string
+	DocumentRoot     string
+	InheritEnv       []string
+	DirectoryListing bool
+	DirectoryIndex   []string
+	DefaultHandler   string
+	AliasList        []*configAlias
+	HandlerList      []*configHandler
+	Logging          *configLogging
 }
 
 func loadConfig(s *cgiserver.Server) (*config, error) {
@@ -53,6 +54,7 @@ func loadConfig(s *cgiserver.Server) (*config, error) {
 	vpr.SetDefault("Address", s.Address)
 	vpr.SetDefault("DocumentRoot", s.DocumentRoot)
 	vpr.SetDefault("InheritEnv", s.InheritEnv)
+	vpr.SetDefault("DirectoryListing", s.DirectoryListing)
 	vpr.SetDefault("DirectoryIndex", s.DirectoryIndex)
 	vpr.SetDefault("DefaultHandler", s.DefaultHandler)
 	vpr.SetConfigName("simple-cgi-server")
