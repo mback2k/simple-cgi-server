@@ -58,8 +58,13 @@ func CGIServer() *Server {
 }
 
 func (s *Server) getURLPath(r *http.Request) string {
-	urlpath := path.Clean(r.URL.Path)
+	urlpath := r.URL.Path
 	log.Debugln("getURLPath", urlpath)
+	if !strings.HasPrefix(urlpath, "/") {
+		urlpath = "/" + urlpath
+		r.URL.Path = urlpath
+	}
+	urlpath = path.Clean(r.URL.Path)
 	for alias := range s.AliasMap {
 		if strings.HasPrefix(urlpath, alias) {
 			urlpath = path.Join(s.AliasMap[alias], urlpath[len(alias):])
