@@ -13,8 +13,8 @@ RUN apk --no-cache --update upgrade && apk --no-cache add ca-certificates
 
 COPY --from=build /go/src/github.com/mback2k/simple-cgi-server/simple-cgi-server /usr/local/bin/simple-cgi-server
 
-RUN addgroup -S serve
-RUN adduser -h /data -S -D -G serve serve
+RUN addgroup -g 8080 -S serve
+RUN adduser -u 8080 -h /data -S -D -G serve serve
 
 WORKDIR /data
 USER serve
