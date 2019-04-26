@@ -1,1 +1,4 @@
+simple-cgi-server
+.DS_Store
+*.py
 *.yaml
