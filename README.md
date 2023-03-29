@@ -19,10 +19,10 @@ Installation
 ------------
 You basically have two options to install this Go program package:
 
-1. If you have Go installed and configured on your PATH, just do the following go get inside your GOPATH to get the latest version:
+1. If you have Go installed and configured on your PATH, just do the following go install inside your GOPATH to get the latest version:
 
 ```
-go get -u github.com/mback2k/simple-cgi-server
+go install github.com/mback2k/simple-cgi-server
 ```
 
 2. If you do not have Go installed and just want to use a released binary,
